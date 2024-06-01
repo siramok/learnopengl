@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/learnopengl.dir/main.cpp.o -o learnopengl  -lglfw /usr/lib64/libOpenGL.so /usr/lib64/libGLX.so /usr/lib64/libGLU.so 

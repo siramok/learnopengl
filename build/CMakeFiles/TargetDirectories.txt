@@ -1,3 +1,0 @@
-/home/siramok/code/learnopengl/build/CMakeFiles/learnopengl.dir
-/home/siramok/code/learnopengl/build/CMakeFiles/edit_cache.dir
-/home/siramok/code/learnopengl/build/CMakeFiles/rebuild_cache.dir

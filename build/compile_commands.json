@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/home/siramok/code/learnopengl/build",
+  "command": "/usr/bin/cc -I/home/siramok/code/learnopengl/include -g -o CMakeFiles/learnopengl.dir/src/glad.c.o -c /home/siramok/code/learnopengl/src/glad.c",
+  "file": "/home/siramok/code/learnopengl/src/glad.c",
+  "output": "CMakeFiles/learnopengl.dir/src/glad.c.o"
+},
+{
+  "directory": "/home/siramok/code/learnopengl/build",
+  "command": "/usr/bin/c++ -I/home/siramok/code/learnopengl/include -g -std=gnu++11 -o CMakeFiles/learnopengl.dir/src/main.cpp.o -c /home/siramok/code/learnopengl/src/main.cpp",
+  "file": "/home/siramok/code/learnopengl/src/main.cpp",
+  "output": "CMakeFiles/learnopengl.dir/src/main.cpp.o"
+}
+]

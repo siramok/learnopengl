@@ -41,9 +41,6 @@ bool first_mouse = true;
 float delta_time = 0.0f; // Time between current frame and last frame
 float last_frame = 0.0f; // Time of last frame
 
-// lighting
-glm::vec3 light_position(1.2f, 1.0f, 2.0f);
-
 int main()
 {
     // glfw: initialize and configure
@@ -137,6 +134,19 @@ int main()
         -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
         -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f};
 
+    glm::vec3 cubePositions[] = {
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(2.0f, 5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3(2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f, 3.0f, -7.5f),
+        glm::vec3(1.3f, -2.0f, -2.5f),
+        glm::vec3(1.5f, 2.0f, -2.5f),
+        glm::vec3(1.5f, 0.2f, -1.5f),
+        glm::vec3(-1.3f, 1.0f, -1.5f),
+    };
+
     unsigned int cube_VAO;
     unsigned int VBO;
     glGenVertexArrays(1, &cube_VAO);
@@ -193,19 +203,19 @@ int main()
         // camera
         main_shader.set_vec3("camera_position", camera.position);
         // material
-        main_shader.set_vec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-        main_shader.set_float("material.shininess", 64.0f);
+        main_shader.set_float("material.shininess", 32.0f);
         // lighting
-        main_shader.set_vec3("light.position", light_position);
+        main_shader.set_vec3("light.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
         main_shader.set_vec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
         main_shader.set_vec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
         main_shader.set_vec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.get_view_matrix();
-        glm::mat4 model = glm::mat4(1.0f);
         main_shader.set_mat4("projection", projection);
         main_shader.set_mat4("view", view);
+
+        glm::mat4 model = glm::mat4(1.0f);
         main_shader.set_mat4("model", model);
 
         glActiveTexture(GL_TEXTURE0);
@@ -214,17 +224,15 @@ int main()
         glBindTexture(GL_TEXTURE_2D, specular_map);
 
         glBindVertexArray(cube_VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
-        light_shader.use();
-        light_shader.set_mat4("projection", projection);
-        light_shader.set_mat4("view", view);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, light_position);
-        model = glm::scale(model, glm::vec3(0.2f));
-        light_shader.set_mat4("model", model);
-        glBindVertexArray(light_VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for (int i = 0; i < 10; i++)
+        {
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            main_shader.set_mat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -287,13 +295,12 @@ void mouse_callback(GLFWwindow *window, double x_pos_in, double y_pos_in)
 {
     float x_pos = static_cast<float>(x_pos_in);
     float y_pos = static_cast<float>(y_pos_in);
-    std::cout << "last_x = " << last_x << ", last_y = " << last_y << ", x_pos = " << x_pos << ", y_pos = " << y_pos << std::endl;
+    std::cout << "last_frame = " << last_frame << ", last_x = " << last_x << ", last_y = " << last_y << ", x_pos = " << x_pos << ", y_pos = " << y_pos << std::endl;
 
-    if (first_mouse)
+    if (last_frame < 3.0f)
     {
-        // last_x = x_pos;
-        // last_y = y_pos;
-        first_mouse = false;
+        last_x = x_pos;
+        last_y = y_pos;
         return;
     }
 

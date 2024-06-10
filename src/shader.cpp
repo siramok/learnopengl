@@ -100,6 +100,12 @@ void Shader::set_mat4(const std::string &name, glm::mat4 &value) const
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 }
 
+void Shader::set_vec3(const std::string &name, glm::vec3 value) const
+{
+    unsigned int location = glGetUniformLocation(program_id, name.c_str());
+    glUniform3f(location, value[0], value[1], value[2]);
+}
+
 void Shader::check_compile_errors(unsigned int shader, std::string type)
 {
     int success;

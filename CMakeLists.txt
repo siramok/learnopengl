@@ -29,16 +29,16 @@ include_directories(${GLFW3_INCLUDE_DIRS})
 # Link the GLFW and OpenGL libraries
 target_link_libraries(learnopengl ${GLFW3_LIBRARIES} ${OPENGL_LIBRARIES})
 
-# Define the source and destination directories for shaders
-set(SHADERS_SRC_DIR "${PROJECT_SOURCE_DIR}/src/assets")
-set(SHADERS_DEST_DIR "${CMAKE_BINARY_DIR}/assets")
+# Define the source and destination directories for assets
+set(ASSETS_SRC_DIR "${PROJECT_SOURCE_DIR}/src/assets")
+set(ASSETS_DEST_DIR "${CMAKE_BINARY_DIR}/assets")
 
 # Add a custom target to copy the assets directory
 add_custom_target(copy_assets ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${SHADERS_SRC_DIR} ${SHADERS_DEST_DIR}
-    COMMENT "Copying shaders directory to build directory"
+    ${ASSETS_SRC_DIR} ${ASSETS_DEST_DIR}
+    COMMENT "Copying assets to build directory"
 )
 
-# Ensure the copy_shaders target is executed before building the executable
+# Ensure the copy_assets target is executed before building the executable
 add_dependencies(learnopengl copy_assets)

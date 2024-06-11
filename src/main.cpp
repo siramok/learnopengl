@@ -33,8 +33,8 @@ const char *light_fragment_shader_path = "assets/shaders/light.frag";
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-float last_x = WINDOW_WIDTH / 2.0f;
-float last_y = WINDOW_HEIGHT / 2.0f;
+float last_x = 0.0;
+float last_y = WINDOW_HEIGHT;
 bool first_mouse = true;
 
 // timing
@@ -297,11 +297,12 @@ void mouse_callback(GLFWwindow *window, double x_pos_in, double y_pos_in)
     float y_pos = static_cast<float>(y_pos_in);
     std::cout << "last_frame = " << last_frame << ", last_x = " << last_x << ", last_y = " << last_y << ", x_pos = " << x_pos << ", y_pos = " << y_pos << std::endl;
 
-    if (last_frame < 3.0f)
+    // workaround an annoying bug where the first frame produces a big offset delta
+    if (first_mouse)
     {
-        last_x = x_pos;
-        last_y = y_pos;
-        return;
+        x_pos = 0.0;
+        y_pos = WINDOW_HEIGHT;
+        first_mouse = false;
     }
 
     float x_offset = x_pos - last_x;

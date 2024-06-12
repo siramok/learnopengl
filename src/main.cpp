@@ -20,6 +20,20 @@ unsigned int load_texture(const char *path);
 // settings
 const unsigned int WINDOW_WIDTH = 1600;
 const unsigned int WINDOW_HEIGHT = 1200;
+const unsigned int N_POINT_LIGHTS = 4;
+
+// camera
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+float last_x = WINDOW_WIDTH / 2.0f;
+float last_y = WINDOW_HEIGHT / 2.0f;
+bool first_call = true;
+
+// timing
+float delta_time = 0.0f; // Time between current frame and last frame
+float last_frame = 0.0f; // Time of last frame
+
+// lighting
+glm::vec3 light_position(1.2f, 1.0f, 2.0f);
 
 // paths
 const char *container_path = "assets/textures/container.jpg";
@@ -30,16 +44,6 @@ const char *vertex_shader_path = "assets/shaders/main.vert";
 const char *fragment_shader_path = "assets/shaders/main.frag";
 const char *light_vertex_shader_path = "assets/shaders/light.vert";
 const char *light_fragment_shader_path = "assets/shaders/light.frag";
-
-// camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-float last_x = 0.0;
-float last_y = WINDOW_HEIGHT;
-bool first_mouse = true;
-
-// timing
-float delta_time = 0.0f; // Time between current frame and last frame
-float last_frame = 0.0f; // Time of last frame
 
 int main()
 {
@@ -134,7 +138,7 @@ int main()
         -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
         -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f};
 
-    glm::vec3 cubePositions[] = {
+    glm::vec3 cube_positions[] = {
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(2.0f, 5.0f, -15.0f),
         glm::vec3(-1.5f, -2.2f, -2.5f),
@@ -145,6 +149,13 @@ int main()
         glm::vec3(1.5f, 2.0f, -2.5f),
         glm::vec3(1.5f, 0.2f, -1.5f),
         glm::vec3(-1.3f, 1.0f, -1.5f),
+    };
+
+    glm::vec3 point_light_positions[] = {
+        glm::vec3(0.7f, 0.2f, 2.0f),
+        glm::vec3(2.3f, -3.3f, -4.0f),
+        glm::vec3(-4.0f, 2.0f, -12.0f),
+        glm::vec3(0.0f, 0.0f, -3.0f),
     };
 
     unsigned int cube_VAO;
@@ -202,13 +213,55 @@ int main()
         main_shader.use();
         // camera
         main_shader.set_vec3("camera_position", camera.position);
-        // material
-        main_shader.set_float("material.shininess", 32.0f);
-        // lighting
-        main_shader.set_vec3("light.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
-        main_shader.set_vec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-        main_shader.set_vec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-        main_shader.set_vec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        main_shader.set_float("material.shininess", 1.0f);
+        // directional light
+        main_shader.set_vec3("directional_light.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+        main_shader.set_vec3("directional_light.ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+        main_shader.set_vec3("directional_light.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
+        main_shader.set_vec3("directional_light.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+        // point light 1
+        main_shader.set_vec3("point_lights[0].position", point_light_positions[0]);
+        main_shader.set_vec3("point_lights[0].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+        main_shader.set_vec3("point_lights[0].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+        main_shader.set_vec3("point_lights[0].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        main_shader.set_float("point_lights[0].constant", 1.0f);
+        main_shader.set_float("point_lights[0].linear", 0.09f);
+        main_shader.set_float("point_lights[0].quadratic", 0.032f);
+        // point light 2
+        main_shader.set_vec3("point_lights[1].position", point_light_positions[1]);
+        main_shader.set_vec3("point_lights[1].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+        main_shader.set_vec3("point_lights[1].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+        main_shader.set_vec3("point_lights[1].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        main_shader.set_float("point_lights[1].constant", 1.0f);
+        main_shader.set_float("point_lights[1].linear", 0.09f);
+        main_shader.set_float("point_lights[1].quadratic", 0.032f);
+        // point light 3
+        main_shader.set_vec3("point_lights[2].position", point_light_positions[2]);
+        main_shader.set_vec3("point_lights[2].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+        main_shader.set_vec3("point_lights[2].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+        main_shader.set_vec3("point_lights[2].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        main_shader.set_float("point_lights[2].constant", 1.0f);
+        main_shader.set_float("point_lights[2].linear", 0.09f);
+        main_shader.set_float("point_lights[2].quadratic", 0.032f);
+        // point light 4
+        main_shader.set_vec3("point_lights[3].position", point_light_positions[3]);
+        main_shader.set_vec3("point_lights[3].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+        main_shader.set_vec3("point_lights[3].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+        main_shader.set_vec3("point_lights[3].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        main_shader.set_float("point_lights[3].constant", 1.0f);
+        main_shader.set_float("point_lights[3].linear", 0.09f);
+        main_shader.set_float("point_lights[3].quadratic", 0.032f);
+        // spot light
+        main_shader.set_vec3("spot_light.position", camera.position);
+        main_shader.set_vec3("spot_light.direction", camera.front);
+        main_shader.set_vec3("spot_light.ambient", glm::vec3(0.0f, 0.0f, 0.0f));
+        main_shader.set_vec3("spot_light.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+        main_shader.set_vec3("spot_light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        main_shader.set_float("spot_light.constant", 1.0f);
+        main_shader.set_float("spot_light.linear", 0.09f);
+        main_shader.set_float("spot_light.quadratic", 0.032f);
+        main_shader.set_float("spot_light.cut_off", glm::cos(glm::radians(12.5f)));
+        main_shader.set_float("spot_light.outer_cut_off", glm::cos(glm::radians(15.0f)));
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.get_view_matrix();
@@ -218,8 +271,10 @@ int main()
         glm::mat4 model = glm::mat4(1.0f);
         main_shader.set_mat4("model", model);
 
+        // bind diffuse map
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuse_map);
+        // bind specular map
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specular_map);
 
@@ -227,10 +282,24 @@ int main()
         for (int i = 0; i < 10; i++)
         {
             model = glm::mat4(1.0f);
-            model = glm::translate(model, cubePositions[i]);
+            model = glm::translate(model, cube_positions[i]);
             float angle = 20.0f * i;
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             main_shader.set_mat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
+        light_shader.use();
+        light_shader.set_mat4("projection", projection);
+        light_shader.set_mat4("view", view);
+
+        glBindVertexArray(light_VAO);
+        for (int i = 0; i < N_POINT_LIGHTS; i++)
+        {
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, point_light_positions[i]);
+            model = glm::scale(model, glm::vec3(0.3f));
+            light_shader.set_mat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
@@ -295,14 +364,14 @@ void mouse_callback(GLFWwindow *window, double x_pos_in, double y_pos_in)
 {
     float x_pos = static_cast<float>(x_pos_in);
     float y_pos = static_cast<float>(y_pos_in);
-    std::cout << "last_frame = " << last_frame << ", last_x = " << last_x << ", last_y = " << last_y << ", x_pos = " << x_pos << ", y_pos = " << y_pos << std::endl;
+    // std::cout << "last_frame = " << last_frame << ", last_x = " << last_x << ", last_y = " << last_y << ", x_pos = " << x_pos << ", y_pos = " << y_pos << std::endl;
 
     // workaround an annoying bug where the first frame produces a big offset delta
-    if (first_mouse)
+    if (first_call)
     {
-        x_pos = 0.0;
-        y_pos = WINDOW_HEIGHT;
-        first_mouse = false;
+        last_x = x_pos;
+        last_y = y_pos;
+        first_call = false;
     }
 
     float x_offset = x_pos - last_x;

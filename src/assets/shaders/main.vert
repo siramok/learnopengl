@@ -14,8 +14,9 @@ out vec3 normal;
 
 void main()
 {
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
-    texture_coords = aTexCoords;
     fragment_position = vec3(model * vec4(aPos, 1.0));
     normal = normalize(mat3(transpose(inverse(view * model))) * aNormal);
+    texture_coords = aTexCoords;
+
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
 }

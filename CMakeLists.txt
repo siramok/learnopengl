@@ -23,11 +23,14 @@ pkg_check_modules(GLFW3 REQUIRED glfw3)
 set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
 
-# Include GLFW
-include_directories(${GLFW3_INCLUDE_DIRS})
+# Find the assimp package
+find_package(assimp REQUIRED)
+
+# Include directories
+target_include_directories(learnopengl PUBLIC ${GLFW3_INCLUDE_DIRS} ${ASSIMP_INCLUDE_DIR})
 
 # Link the GLFW and OpenGL libraries
-target_link_libraries(learnopengl ${GLFW3_LIBRARIES} ${OPENGL_LIBRARIES})
+target_link_libraries(learnopengl ${GLFW3_LIBRARIES} ${OPENGL_LIBRARIES} ${ASSIMP_LIBRARIES})
 
 # Define the source and destination directories for assets
 set(ASSETS_SRC_DIR "${PROJECT_SOURCE_DIR}/src/assets")
